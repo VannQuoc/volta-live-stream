@@ -36,9 +36,12 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
         maxBufferLength: 30,
         maxMaxBufferLength: 60,
         startLevel: -1, // Auto quality
-        xhrSetup: (xhr) => {
-          // Add headers to help with CORS
-          xhr.withCredentials = false;
+        xhrSetup: (xhr, url) => {
+          // CloudFront signed URLs sometimes require credentialed requests.
+          // If CORS is not allowed by the CDN, the only real fix is a proxy.
+          const isSigned = typeof url === 'string' && (url.includes('Policy=') || url.includes('Signature=') || url.includes('Key-Pair-Id='));
+          xhr.withCredentials = isSigned;
+          console.log('[HLS] xhrSetup', { url, withCredentials: xhr.withCredentials });
         },
       });
       
