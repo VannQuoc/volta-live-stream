@@ -1,11 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
-import { Play, AlertCircle, RefreshCw } from 'lucide-react';
+import { Play, AlertCircle, RefreshCw, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VideoPlayerProps {
   streamUrl?: string;
   isLive: boolean;
+}
+
+// Proxy URL để bypass CORS cho HLS stream
+const HLS_PROXY_URL = 'https://iuvtr.sb21.net/';
+
+function buildProxiedUrl(originalUrl: string): string {
+  // Sử dụng proxy của họ: https://iuvtr.sb21.net/?link=<encoded_url>&sound=on
+  const encodedUrl = encodeURIComponent(originalUrl);
+  return `${HLS_PROXY_URL}?link=${encodedUrl}&sound=on`;
 }
 
 export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
@@ -14,6 +23,7 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
 
   const loadStream = () => {
     const video = videoRef.current;
@@ -28,6 +38,10 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
       hlsRef.current = null;
     }
 
+    // Build proxied URL
+    const proxiedUrl = buildProxiedUrl(streamUrl);
+    console.log('[VideoPlayer] Loading stream:', { original: streamUrl, proxied: proxiedUrl });
+
     if (Hls.isSupported()) {
       const hls = new Hls({
         enableWorker: true,
@@ -36,18 +50,12 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
         maxBufferLength: 30,
         maxMaxBufferLength: 60,
         startLevel: -1, // Auto quality
-        xhrSetup: (xhr, url) => {
-          // CloudFront signed URLs sometimes require credentialed requests.
-          // If CORS is not allowed by the CDN, the only real fix is a proxy.
-          const isSigned = typeof url === 'string' && (url.includes('Policy=') || url.includes('Signature=') || url.includes('Key-Pair-Id='));
-          xhr.withCredentials = isSigned;
-          console.log('[HLS] xhrSetup', { url, withCredentials: xhr.withCredentials });
-        },
       });
       
       hlsRef.current = hls;
       
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        console.log('[VideoPlayer] Manifest parsed, starting playback');
         setLoading(false);
         setError(null);
         video.play().catch((e) => {
@@ -56,14 +64,14 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
       });
 
       hls.on(Hls.Events.ERROR, (_, data) => {
-        console.error('HLS Error:', data);
+        console.error('[VideoPlayer] HLS Error:', data);
         
         if (data.fatal) {
           setLoading(false);
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
               if (data.details === 'manifestLoadError') {
-                setError('Không thể tải video stream. Stream có thể bị chặn bởi CORS hoặc chưa sẵn sàng.');
+                setError('Không thể tải video stream. Vui lòng thử lại.');
               } else {
                 setError('Lỗi mạng khi tải video. Đang thử lại...');
                 // Retry after delay
@@ -76,7 +84,7 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
               }
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
-              setError('Lỗi media. Đang khôi phục...');
+              console.log('[VideoPlayer] Recovering from media error');
               hls.recoverMediaError();
               break;
             default:
@@ -87,12 +95,12 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
         }
       });
 
-      hls.loadSource(streamUrl);
+      hls.loadSource(proxiedUrl);
       hls.attachMedia(video);
       
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Native HLS support (Safari)
-      video.src = streamUrl;
+      video.src = proxiedUrl;
       video.addEventListener('loadedmetadata', () => {
         setLoading(false);
         video.play().catch(console.error);
@@ -103,6 +111,14 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
       });
     } else {
       setError('Trình duyệt không hỗ trợ phát video HLS.');
+    }
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = !video.muted;
+      setIsMuted(video.muted);
     }
   };
 
@@ -154,15 +170,10 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
           <div className="flex flex-col items-center gap-4 p-6 text-center max-w-md">
             <AlertCircle className="w-12 h-12 text-destructive" />
             <p className="text-muted-foreground">{error}</p>
-            <div className="flex flex-col gap-2 w-full">
-              <Button onClick={loadStream} variant="secondary" className="gap-2">
-                <RefreshCw className="w-4 h-4" />
-                Thử lại
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Stream URL: <code className="text-[10px] break-all">{streamUrl}</code>
-              </p>
-            </div>
+            <Button onClick={loadStream} variant="secondary" className="gap-2">
+              <RefreshCw className="w-4 h-4" />
+              Thử lại
+            </Button>
           </div>
         </div>
       )}
@@ -171,14 +182,30 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
         ref={videoRef}
         className="w-full h-full object-contain"
         autoPlay
-        muted
+        muted={isMuted}
         playsInline
         controls
       />
       
-      <div className="absolute top-3 left-3 flex items-center gap-2 bg-primary/90 px-3 py-1.5 rounded-full z-10">
-        <span className="w-2 h-2 bg-primary-foreground rounded-full volta-pulse" />
-        <span className="text-xs font-bold text-primary-foreground uppercase tracking-wider">LIVE</span>
+      {/* Top controls */}
+      <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
+        <div className="flex items-center gap-2 bg-primary/90 px-3 py-1.5 rounded-full">
+          <span className="w-2 h-2 bg-primary-foreground rounded-full volta-pulse" />
+          <span className="text-xs font-bold text-primary-foreground uppercase tracking-wider">LIVE</span>
+        </div>
+        
+        <Button
+          variant="secondary"
+          size="icon"
+          className="h-8 w-8 rounded-full bg-black/50 hover:bg-black/70"
+          onClick={toggleMute}
+        >
+          {isMuted ? (
+            <VolumeX className="w-4 h-4" />
+          ) : (
+            <Volume2 className="w-4 h-4" />
+          )}
+        </Button>
       </div>
     </div>
   );
