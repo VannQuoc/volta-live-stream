@@ -5,9 +5,10 @@ export interface VoltaMatch {
   homeLogo: string;
   awayLogo: string;
   isLive: boolean;
+  stateCode?: number; // field 25
   streamUrl?: string;
-  startTime: string;
-  serverTime: string;
+  serverSnapshotTime: string; // field 0 - thời gian server snapshot (thay đổi theo từng message)
+  kickoffTime: string; // field 28 - mốc thời gian kickoff/close bet
   odds: {
     home: number;
     away: number;
@@ -101,9 +102,10 @@ export function parseVoltaData(data: string): VoltaLeague | null {
           homeLogo: m["19"],
           awayLogo: m["20"],
           isLive: m["1"] === true,
+          stateCode: m["25"],
           streamUrl: m["22"],
-          startTime: m["0"],
-          serverTime: m["28"] || m["0"],
+          serverSnapshotTime: m["0"], // field 0 - server snapshot time
+          kickoffTime: m["28"] || m["0"], // field 28 - kickoff/close bet time
           odds: { home: homeOdds, away: awayOdds },
           bettingStats: {
             homeAmount: m["24"]?.["0"] || 0,

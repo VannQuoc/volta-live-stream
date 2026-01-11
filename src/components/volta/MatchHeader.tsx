@@ -1,5 +1,5 @@
 import { VoltaMatch } from '@/types/volta';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Clock, Zap } from 'lucide-react';
 
 interface MatchHeaderProps {
@@ -7,36 +7,47 @@ interface MatchHeaderProps {
 }
 
 export function MatchHeader({ match }: MatchHeaderProps) {
-  const [countdown, setCountdown] = useState('00:00');
+  const [displayTime, setDisplayTime] = useState('00:00');
+  const localStartRef = useRef<number>(0);
+  const serverOffsetRef = useRef<number>(0);
 
   useEffect(() => {
-    const updateCountdown = () => {
-      const now = new Date();
-      const start = new Date(match.startTime);
-      const server = new Date(match.serverTime);
+    // Khi nhận được message mới, tính toán offset
+    const serverSnapshot = new Date(match.serverSnapshotTime).getTime();
+    const kickoff = new Date(match.kickoffTime).getTime();
+    const localNow = Date.now();
+    
+    // Server offset = local time - server snapshot time
+    serverOffsetRef.current = localNow - serverSnapshot;
+    localStartRef.current = localNow;
+
+    const updateTime = () => {
+      const now = Date.now();
+      const elapsedSinceMessage = now - localStartRef.current;
       
-      // Calculate time difference
-      const diff = start.getTime() - server.getTime();
-      const remaining = Math.max(0, diff);
+      // Thời gian server hiện tại (ước tính) = serverSnapshot + elapsed
+      const estimatedServerNow = new Date(match.serverSnapshotTime).getTime() + elapsedSinceMessage;
+      const kickoffTime = new Date(match.kickoffTime).getTime();
       
       if (match.isLive) {
-        // Show elapsed time when live
-        const elapsed = Math.abs(diff);
+        // Khi live: đếm thời gian đã trôi qua kể từ kickoff
+        const elapsed = Math.max(0, estimatedServerNow - kickoffTime);
         const mins = Math.floor(elapsed / 60000);
         const secs = Math.floor((elapsed % 60000) / 1000);
-        setCountdown(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
+        setDisplayTime(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
       } else {
-        // Show countdown when betting
+        // Khi betting: đếm ngược đến kickoff
+        const remaining = Math.max(0, kickoffTime - estimatedServerNow);
         const mins = Math.floor(remaining / 60000);
         const secs = Math.floor((remaining % 60000) / 1000);
-        setCountdown(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
+        setDisplayTime(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
       }
     };
 
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
-  }, [match.startTime, match.serverTime, match.isLive]);
+  }, [match.serverSnapshotTime, match.kickoffTime, match.isLive]);
 
   return (
     <div className="volta-card p-6">
@@ -99,7 +110,10 @@ export function MatchHeader({ match }: MatchHeaderProps) {
           )}
           <div className="flex items-center gap-2 bg-muted px-4 py-2 rounded-lg">
             <Clock className="w-4 h-4 text-muted-foreground" />
-            <span className="font-display font-bold text-xl tabular-nums">{countdown}</span>
+            <span className="font-display font-bold text-xl tabular-nums">{displayTime}</span>
+            {!match.isLive && (
+              <span className="text-xs text-muted-foreground">còn lại</span>
+            )}
           </div>
         </div>
 
