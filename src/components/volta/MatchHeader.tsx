@@ -60,84 +60,78 @@ export function MatchHeader({ match }: MatchHeaderProps) {
     return () => clearInterval(interval);
   }, [match.serverSnapshotTime, match.kickoffTime, match.isLive]);
 
+  const hasResult = match.result && (match.result.home === 1 || match.result.away === 1);
+  const homeWin = match.result?.home === 1;
+  const awayWin = match.result?.away === 1;
+
   return (
-    <div className="volta-card p-6">
-      <div className="flex items-center justify-between gap-4">
+    <div className="volta-card p-3 sm:p-6">
+      <div className="flex items-center justify-between gap-2 sm:gap-4">
         {/* Home Team */}
-        <div className="flex-1 flex flex-col items-center gap-3">
+        <div className={`flex-1 flex flex-col items-center gap-1.5 sm:gap-3 transition-all duration-500 ${hasResult ? (homeWin ? 'scale-105' : 'opacity-40 scale-95') : ''}`}>
           <div className="relative">
             <img
               src={match.homeLogo}
               alt={match.homeTeam}
-              className="w-20 h-20 object-contain drop-shadow-lg"
+              className={`w-12 h-12 sm:w-20 sm:h-20 object-contain drop-shadow-lg transition-all duration-500 ${homeWin ? 'drop-shadow-[0_0_15px_hsl(45,100%,50%,0.5)]' : ''}`}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/placeholder.svg';
               }}
             />
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-volta-home/20 px-2 py-0.5 rounded text-[10px] font-bold text-volta-home uppercase">
+            {homeWin && showResultAnimation && (
+              <div className="absolute -top-2 -right-2 volta-winner-badge">
+                <span className="text-xl sm:text-2xl volta-trophy-glow">🏆</span>
+              </div>
+            )}
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-volta-home/20 px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[10px] font-bold text-volta-home uppercase">
               Home
             </div>
           </div>
-          <h3 className="font-display font-bold text-lg text-center leading-tight">
+          <h3 className="font-display font-bold text-xs sm:text-lg text-center leading-tight line-clamp-2">
             {match.homeTeam}
           </h3>
-          <div className="bg-volta-home/10 border border-volta-home/30 px-4 py-1.5 rounded-lg">
-            <span className="font-display font-bold text-volta-home text-xl">
+          <div className={`bg-volta-home/10 border border-volta-home/30 px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg ${homeWin ? 'bg-green-500/20 border-green-500/50' : ''}`}>
+            <span className={`font-display font-bold text-sm sm:text-xl ${homeWin ? 'text-green-400' : 'text-volta-home'}`}>
               {match.odds.home.toFixed(2)}
             </span>
           </div>
         </div>
 
         {/* Center - Score/Countdown */}
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-1 sm:gap-2">
           {(() => {
-            // Kiểm tra kết quả - result.home hoặc result.away = 1 nghĩa là đội đó thắng
-            // Hiển thị ngay khi có result, không đợi isLive = false
-            const hasResult = match.result && (match.result.home === 1 || match.result.away === 1);
-            const homeWin = match.result?.home === 1;
-            const awayWin = match.result?.away === 1;
-
             // Ưu tiên hiển thị kết quả khi có result (dù vẫn đang live)
             if (hasResult) {
               return (
-                <>
-                  <div className={`flex items-center gap-1 bg-green-500 px-3 py-1 rounded-full ${showResultAnimation ? 'animate-scale-in' : ''}`}>
+                <div className={`flex flex-col items-center gap-1 sm:gap-2 ${showResultAnimation ? 'volta-winner-reveal' : ''}`}>
+                  <div className="flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-400 px-2 sm:px-3 py-1 rounded-full volta-winner-badge shadow-lg shadow-green-500/30">
                     <Trophy className="w-3 h-3 text-white" />
-                    <span className="text-xs font-bold text-white">KẾT THÚC</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-white">WINNER</span>
                   </div>
-                  <div className={`font-display text-5xl font-black tracking-tight flex items-center gap-3 ${showResultAnimation ? 'animate-bounce' : ''}`}>
-                    <div className={`flex flex-col items-center ${homeWin ? 'scale-110' : 'opacity-50'}`}>
-                      <span className={`${homeWin ? 'text-green-400 animate-pulse' : 'text-volta-home'}`}>
-                        {homeWin ? '🏆' : ''}
-                      </span>
-                      <span className={homeWin ? 'text-green-400' : 'text-volta-home'}>
-                        {match.result!.home}
-                      </span>
-                    </div>
-                    <span className="text-muted-foreground">-</span>
-                    <div className={`flex flex-col items-center ${awayWin ? 'scale-110' : 'opacity-50'}`}>
-                      <span className={`${awayWin ? 'text-green-400 animate-pulse' : 'text-volta-away'}`}>
-                        {awayWin ? '🏆' : ''}
-                      </span>
-                      <span className={awayWin ? 'text-green-400' : 'text-volta-away'}>
-                        {match.result!.away}
-                      </span>
-                    </div>
+                  <div className="font-display text-3xl sm:text-5xl font-black tracking-tight flex items-center gap-2 sm:gap-4">
+                    <span className={`transition-all duration-300 ${homeWin ? 'text-green-400' : 'text-muted-foreground/30'}`}>
+                      {match.result!.home}
+                    </span>
+                    <span className="text-muted-foreground/50 text-xl sm:text-3xl">:</span>
+                    <span className={`transition-all duration-300 ${awayWin ? 'text-green-400' : 'text-muted-foreground/30'}`}>
+                      {match.result!.away}
+                    </span>
                   </div>
-                  <div className="text-sm font-bold mt-1">
-                    {homeWin && <span className="text-green-400">{match.homeTeam} THẮNG!</span>}
-                    {awayWin && <span className="text-green-400">{match.awayTeam} THẮNG!</span>}
+                  <div className="volta-winner-text text-[10px] sm:text-sm font-bold text-center">
+                    <span className="text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full">
+                      {homeWin ? match.homeTeam : match.awayTeam} 🎉
+                    </span>
                   </div>
-                </>
+                </div>
               );
             } else if (match.isLive) {
               return (
                 <>
-                  <div className="flex items-center gap-1 bg-primary px-3 py-1 rounded-full">
+                  <div className="flex items-center gap-1 bg-primary px-2 sm:px-3 py-1 rounded-full volta-glow-live">
                     <Zap className="w-3 h-3 text-primary-foreground" />
-                    <span className="text-xs font-bold text-primary-foreground">LIVE</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-primary-foreground">LIVE</span>
                   </div>
-                  <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
+                  <div className="font-display text-3xl sm:text-5xl font-black text-muted-foreground tracking-tight">
                     VS
                   </div>
                 </>
@@ -145,46 +139,51 @@ export function MatchHeader({ match }: MatchHeaderProps) {
             } else {
               return (
                 <>
-                  <div className="flex items-center gap-1 bg-secondary px-3 py-1 rounded-full">
+                  <div className="flex items-center gap-1 bg-secondary px-2 sm:px-3 py-1 rounded-full">
                     <Clock className="w-3 h-3 text-secondary-foreground" />
-                    <span className="text-xs font-bold text-secondary-foreground">BETTING</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-secondary-foreground">BETTING</span>
                   </div>
-                  <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
+                  <div className="font-display text-3xl sm:text-5xl font-black text-muted-foreground tracking-tight">
                     VS
                   </div>
                 </>
               );
             }
           })()}
-          <div className="flex items-center gap-2 bg-muted px-4 py-2 rounded-lg">
-            <Clock className="w-4 h-4 text-muted-foreground" />
-            <span className="font-display font-bold text-xl tabular-nums">{displayTime}</span>
-            {!match.isLive && !(match.result && (match.result.home === 1 || match.result.away === 1)) && (
-              <span className="text-xs text-muted-foreground">còn lại</span>
+          <div className="flex items-center gap-1 sm:gap-2 bg-muted px-2 sm:px-4 py-1 sm:py-2 rounded-lg">
+            <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
+            <span className="font-display font-bold text-base sm:text-xl tabular-nums">{displayTime}</span>
+            {!match.isLive && !hasResult && (
+              <span className="text-[10px] sm:text-xs text-muted-foreground">còn lại</span>
             )}
           </div>
         </div>
 
         {/* Away Team */}
-        <div className="flex-1 flex flex-col items-center gap-3">
+        <div className={`flex-1 flex flex-col items-center gap-1.5 sm:gap-3 transition-all duration-500 ${hasResult ? (awayWin ? 'scale-105' : 'opacity-40 scale-95') : ''}`}>
           <div className="relative">
             <img
               src={match.awayLogo}
               alt={match.awayTeam}
-              className="w-20 h-20 object-contain drop-shadow-lg"
+              className={`w-12 h-12 sm:w-20 sm:h-20 object-contain drop-shadow-lg transition-all duration-500 ${awayWin ? 'drop-shadow-[0_0_15px_hsl(45,100%,50%,0.5)]' : ''}`}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/placeholder.svg';
               }}
             />
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-volta-away/20 px-2 py-0.5 rounded text-[10px] font-bold text-volta-away uppercase">
+            {awayWin && showResultAnimation && (
+              <div className="absolute -top-2 -right-2 volta-winner-badge">
+                <span className="text-xl sm:text-2xl volta-trophy-glow">🏆</span>
+              </div>
+            )}
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-volta-away/20 px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[10px] font-bold text-volta-away uppercase">
               Away
             </div>
           </div>
-          <h3 className="font-display font-bold text-lg text-center leading-tight">
+          <h3 className="font-display font-bold text-xs sm:text-lg text-center leading-tight line-clamp-2">
             {match.awayTeam}
           </h3>
-          <div className="bg-volta-away/10 border border-volta-away/30 px-4 py-1.5 rounded-lg">
-            <span className="font-display font-bold text-volta-away text-xl">
+          <div className={`bg-volta-away/10 border border-volta-away/30 px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg ${awayWin ? 'bg-green-500/20 border-green-500/50' : ''}`}>
+            <span className={`font-display font-bold text-sm sm:text-xl ${awayWin ? 'text-green-400' : 'text-volta-away'}`}>
               {match.odds.away.toFixed(2)}
             </span>
           </div>
