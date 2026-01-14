@@ -22,7 +22,13 @@ function maskUsername(username: string): string {
 }
 
 export function LiveBetFeed({ bets }: LiveBetFeedProps) {
-  const [isMinimized, setIsMinimized] = useState(true);
+  // Default expanded on desktop (lg+), minimized on mobile
+  const [isMinimized, setIsMinimized] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 1024;
+    }
+    return true;
+  });
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
