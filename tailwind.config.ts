@@ -79,7 +79,8 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       screens: {
-        'landscape': { 'raw': '(orientation: landscape) and (max-height: 500px)' },
+        // Only treat landscape as "mobile landscape" to avoid breaking desktop layouts
+        landscape: { raw: '(orientation: landscape) and (max-height: 500px) and (max-width: 1023px)' },
       },
     },
   },
