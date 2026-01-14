@@ -6,16 +6,28 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { useDeviceType } from "@/hooks/useDeviceType";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
-function App() {
-  // Adds html markers: data-device + classes for CSS targeting
-  useDeviceType();
+// Sync device markers to body for CSS attribute selectors
+function DeviceMarkerSync() {
+  const { device, orientation, isFullscreen } = useDeviceType();
+  
+  useEffect(() => {
+    document.body.dataset.device = device;
+    document.body.dataset.orientation = orientation;
+    document.body.dataset.fullscreen = String(isFullscreen);
+  }, [device, orientation, isFullscreen]);
+  
+  return null;
+}
 
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <DeviceMarkerSync />
         <Toaster />
         <Sonner />
         <BrowserRouter>
