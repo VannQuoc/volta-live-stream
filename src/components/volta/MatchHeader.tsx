@@ -85,17 +85,21 @@ export function MatchHeader({ match }: MatchHeaderProps) {
                 <Zap className="w-3 h-3 text-primary-foreground" />
                 <span className="text-xs font-bold text-primary-foreground">LIVE</span>
               </div>
-              {match.result ? (
-                <div className="font-display text-5xl font-black tracking-tight">
-                  <span className="text-volta-home">{match.result.home}</span>
-                  <span className="text-muted-foreground mx-2">-</span>
-                  <span className="text-volta-away">{match.result.away}</span>
-                </div>
-              ) : (
-                <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
-                  VS
-                </div>
-              )}
+              {/* Chỉ hiện VS khi đang live, kết quả sẽ hiện sau khi kết thúc */}
+              <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
+                VS
+              </div>
+            </>
+          ) : match.result ? (
+            <>
+              <div className="flex items-center gap-1 bg-green-500 px-3 py-1 rounded-full">
+                <span className="text-xs font-bold text-white">KẾT THÚC</span>
+              </div>
+              <div className="font-display text-5xl font-black tracking-tight">
+                <span className="text-volta-home">{match.result.home}</span>
+                <span className="text-muted-foreground mx-2">-</span>
+                <span className="text-volta-away">{match.result.away}</span>
+              </div>
             </>
           ) : (
             <>
