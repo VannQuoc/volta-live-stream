@@ -14,14 +14,14 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center volta-glow-live">
-              <Gamepad2 className="w-6 h-6 text-primary-foreground" />
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg flex items-center justify-center volta-glow-live">
+              <Gamepad2 className="w-4 h-4 sm:w-6 sm:h-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="font-display font-bold text-xl">VOLTA LIVE</h1>
-              <p className="text-xs text-muted-foreground">
+              <h1 className="font-display font-bold text-base sm:text-xl">VOLTA LIVE</h1>
+              <p className="text-[10px] sm:text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-none">
                 {league?.name || 'Virtual Football Betting'}
               </p>
             </div>
@@ -35,23 +35,23 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-2 sm:px-4 py-3 sm:py-6">
         {!currentMatch ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6 animate-pulse">
-              <Trophy className="w-12 h-12 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center py-12 sm:py-20">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-muted rounded-full flex items-center justify-center mb-4 sm:mb-6 animate-pulse">
+              <Trophy className="w-8 h-8 sm:w-12 sm:h-12 text-muted-foreground" />
             </div>
-            <h2 className="font-display font-bold text-2xl mb-2">
+            <h2 className="font-display font-bold text-lg sm:text-2xl mb-2 text-center">
               {isConnected ? 'Đang tải trận đấu...' : 'Đang kết nối...'}
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Vui lòng đợi trong giây lát
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-6">
             {/* Left Column - Video & Match Header */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-3 sm:space-y-6">
               <VideoPlayer
                 streamUrl={currentMatch.streamUrl}
                 isLive={currentMatch.isLive}
@@ -60,7 +60,7 @@ const Index = () => {
             </div>
 
             {/* Right Column - Stats & Feed */}
-            <div className="space-y-6">
+            <div className="space-y-3 sm:space-y-6">
               <BettingStats match={currentMatch} />
               <LiveBetFeed bets={currentMatch.liveBets} />
             </div>
@@ -69,8 +69,8 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-auto py-4">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border mt-auto py-2 sm:py-4">
+        <div className="container mx-auto px-2 sm:px-4 text-center text-xs sm:text-sm text-muted-foreground">
           <p>Volta League • Match ID: {currentMatch?.matchId || '---'}</p>
         </div>
       </footer>
