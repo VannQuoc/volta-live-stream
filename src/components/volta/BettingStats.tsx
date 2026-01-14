@@ -20,7 +20,13 @@ function formatAmount(amount: number): string {
 }
 
 export function BettingStats({ match }: BettingStatsProps) {
-  const [isMinimized, setIsMinimized] = useState(true);
+  // Default expanded on desktop (lg+), minimized on mobile
+  const [isMinimized, setIsMinimized] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 1024;
+    }
+    return true;
+  });
   const { bettingStats } = match;
   const totalAmount = bettingStats.homeAmount + bettingStats.awayAmount;
   const homePercent = totalAmount > 0 ? (bettingStats.homeAmount / totalAmount) * 100 : 50;

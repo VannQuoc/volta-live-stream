@@ -56,13 +56,13 @@ const Index = () => {
                 streamUrl={currentMatch.streamUrl}
                 isLive={currentMatch.isLive}
               />
-              <div className="landscape:hidden sm:block">
+              <div className="landscape:hidden">
                 <MatchHeader match={currentMatch} />
               </div>
             </div>
 
-            {/* Right Column - Stats & Feed */}
-            <div className="space-y-3 sm:space-y-6 landscape:hidden">
+            {/* Right Column - Stats & Feed - Always visible on desktop */}
+            <div className="space-y-3 sm:space-y-6 landscape:hidden lg:block">
               <BettingStats match={currentMatch} />
               <LiveBetFeed bets={currentMatch.liveBets} />
             </div>
