@@ -84,43 +84,74 @@ export function MatchHeader({ match }: MatchHeaderProps) {
 
         {/* Center - Score/Countdown */}
         <div className="flex flex-col items-center gap-2">
-          {match.isLive ? (
-            <>
-              <div className="flex items-center gap-1 bg-primary px-3 py-1 rounded-full">
-                <Zap className="w-3 h-3 text-primary-foreground" />
-                <span className="text-xs font-bold text-primary-foreground">LIVE</span>
-              </div>
-              <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
-                VS
-              </div>
-            </>
-          ) : match.result ? (
-            <>
-              <div className={`flex items-center gap-1 bg-green-500 px-3 py-1 rounded-full ${showResultAnimation ? 'animate-scale-in' : ''}`}>
-                <Trophy className="w-3 h-3 text-white" />
-                <span className="text-xs font-bold text-white">KẾT THÚC</span>
-              </div>
-              <div className={`font-display text-5xl font-black tracking-tight ${showResultAnimation ? 'animate-bounce' : ''}`}>
-                <span className="text-volta-home animate-pulse">{match.result.home}</span>
-                <span className="text-muted-foreground mx-2">-</span>
-                <span className="text-volta-away animate-pulse">{match.result.away}</span>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center gap-1 bg-secondary px-3 py-1 rounded-full">
-                <Clock className="w-3 h-3 text-secondary-foreground" />
-                <span className="text-xs font-bold text-secondary-foreground">BETTING</span>
-              </div>
-              <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
-                VS
-              </div>
-            </>
-          )}
+          {(() => {
+            // Kiểm tra kết quả - result.home hoặc result.away = 1 nghĩa là đội đó thắng
+            const hasResult = match.result && (match.result.home === 1 || match.result.away === 1);
+            const homeWin = match.result?.home === 1;
+            const awayWin = match.result?.away === 1;
+
+            if (match.isLive) {
+              return (
+                <>
+                  <div className="flex items-center gap-1 bg-primary px-3 py-1 rounded-full">
+                    <Zap className="w-3 h-3 text-primary-foreground" />
+                    <span className="text-xs font-bold text-primary-foreground">LIVE</span>
+                  </div>
+                  <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
+                    VS
+                  </div>
+                </>
+              );
+            } else if (hasResult) {
+              return (
+                <>
+                  <div className={`flex items-center gap-1 bg-green-500 px-3 py-1 rounded-full ${showResultAnimation ? 'animate-scale-in' : ''}`}>
+                    <Trophy className="w-3 h-3 text-white" />
+                    <span className="text-xs font-bold text-white">KẾT THÚC</span>
+                  </div>
+                  <div className={`font-display text-5xl font-black tracking-tight flex items-center gap-3 ${showResultAnimation ? 'animate-bounce' : ''}`}>
+                    <div className={`flex flex-col items-center ${homeWin ? 'scale-110' : 'opacity-50'}`}>
+                      <span className={`${homeWin ? 'text-green-400 animate-pulse' : 'text-volta-home'}`}>
+                        {homeWin ? '🏆' : ''}
+                      </span>
+                      <span className={homeWin ? 'text-green-400' : 'text-volta-home'}>
+                        {match.result!.home}
+                      </span>
+                    </div>
+                    <span className="text-muted-foreground">-</span>
+                    <div className={`flex flex-col items-center ${awayWin ? 'scale-110' : 'opacity-50'}`}>
+                      <span className={`${awayWin ? 'text-green-400 animate-pulse' : 'text-volta-away'}`}>
+                        {awayWin ? '🏆' : ''}
+                      </span>
+                      <span className={awayWin ? 'text-green-400' : 'text-volta-away'}>
+                        {match.result!.away}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-sm font-bold mt-1">
+                    {homeWin && <span className="text-green-400">{match.homeTeam} THẮNG!</span>}
+                    {awayWin && <span className="text-green-400">{match.awayTeam} THẮNG!</span>}
+                  </div>
+                </>
+              );
+            } else {
+              return (
+                <>
+                  <div className="flex items-center gap-1 bg-secondary px-3 py-1 rounded-full">
+                    <Clock className="w-3 h-3 text-secondary-foreground" />
+                    <span className="text-xs font-bold text-secondary-foreground">BETTING</span>
+                  </div>
+                  <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
+                    VS
+                  </div>
+                </>
+              );
+            }
+          })()}
           <div className="flex items-center gap-2 bg-muted px-4 py-2 rounded-lg">
             <Clock className="w-4 h-4 text-muted-foreground" />
             <span className="font-display font-bold text-xl tabular-nums">{displayTime}</span>
-            {!match.isLive && !match.result && (
+            {!match.isLive && !(match.result && (match.result.home === 1 || match.result.away === 1)) && (
               <span className="text-xs text-muted-foreground">còn lại</span>
             )}
           </div>
