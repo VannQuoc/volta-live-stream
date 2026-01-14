@@ -4,6 +4,52 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== COMPACT MODE STYLES (mobile/tablet + landscape + fullscreen) ===== */
+html.compact-mode .compact-hidden {
+  display: none !important;
+}
+
+html.compact-mode .compact-small {
+  transform: scale(0.75);
+  transform-origin: center;
+}
+
+html.compact-mode .compact-team-logo {
+  width: 2rem !important;
+  height: 2rem !important;
+}
+
+html.compact-mode .compact-team-name {
+  font-size: 0.6rem !important;
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.compact-mode .compact-odds {
+  padding: 0.2rem 0.4rem !important;
+  font-size: 0.65rem !important;
+}
+
+html.compact-mode .compact-header {
+  padding: 0.5rem !important;
+  gap: 0.5rem !important;
+}
+
+html.compact-mode .compact-vs {
+  font-size: 1.25rem !important;
+}
+
+html.compact-mode .compact-score {
+  font-size: 1.5rem !important;
+}
+
+html.compact-mode .compact-badge {
+  padding: 0.15rem 0.35rem !important;
+  font-size: 0.5rem !important;
+}
+
 @layer base {
   :root {
     --background: 222 47% 6%;
@@ -262,20 +308,25 @@
   html.device-mobile .not-mobile { display: none; }
   html.device-tablet .not-tablet { display: none; }
 
-  /* Visual debug badge (shows current detected device/orientation) */
-  body[data-device]::after {
-    content: "device=" attr(data-device) " • " attr(data-orientation);
+  /* Visual debug badge (shows current detected device/orientation/fullscreen) */
+  body::after {
+    content: attr(data-device) " • " attr(data-orientation) " • fs:" attr(data-fullscreen);
     position: fixed;
     bottom: 10px;
     left: 10px;
     z-index: 9999;
     padding: 6px 10px;
     border-radius: 999px;
-    font: 600 12px/1.2 ui-sans-serif, system-ui;
+    font: 600 11px/1.2 ui-sans-serif, system-ui;
     color: hsl(var(--foreground));
-    background: hsl(var(--card) / 0.8);
+    background: hsl(var(--card) / 0.85);
     border: 1px solid hsl(var(--border));
     backdrop-filter: blur(8px);
     pointer-events: none;
+  }
+
+  /* Hide debug in compact mode */
+  html.compact-mode body::after {
+    display: none;
   }
 }

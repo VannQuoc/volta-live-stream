@@ -65,7 +65,7 @@ export function MatchHeader({ match }: MatchHeaderProps) {
   const awayWin = match.result?.away === 1;
 
   return (
-    <div className="volta-card p-3 sm:p-6">
+    <div className="volta-card p-3 sm:p-6 compact-header">
       <div className="flex items-center justify-between gap-2 sm:gap-4">
         {/* Home Team */}
         <div className={`flex-1 flex flex-col items-center gap-1.5 sm:gap-3 transition-all duration-500 ${hasResult ? (homeWin ? 'scale-105' : 'opacity-40 scale-95') : ''}`}>
@@ -73,24 +73,24 @@ export function MatchHeader({ match }: MatchHeaderProps) {
             <img
               src={match.homeLogo}
               alt={match.homeTeam}
-              className={`w-12 h-12 sm:w-20 sm:h-20 object-contain drop-shadow-lg transition-all duration-500 ${homeWin ? 'drop-shadow-[0_0_15px_hsl(45,100%,50%,0.5)]' : ''}`}
+              className={`w-12 h-12 sm:w-20 sm:h-20 object-contain drop-shadow-lg transition-all duration-500 compact-team-logo ${homeWin ? 'drop-shadow-[0_0_15px_hsl(45,100%,50%,0.5)]' : ''}`}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/placeholder.svg';
               }}
             />
             {homeWin && showResultAnimation && (
-              <div className="absolute -top-2 -right-2 volta-winner-badge">
+              <div className="absolute -top-2 -right-2 volta-winner-badge compact-hidden">
                 <span className="text-xl sm:text-2xl volta-trophy-glow">🏆</span>
               </div>
             )}
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-volta-home/20 px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[10px] font-bold text-volta-home uppercase">
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-volta-home/20 px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[10px] font-bold text-volta-home uppercase compact-hidden">
               Home
             </div>
           </div>
-          <h3 className="font-display font-bold text-xs sm:text-lg text-center leading-tight line-clamp-2">
+          <h3 className="font-display font-bold text-xs sm:text-lg text-center leading-tight line-clamp-2 compact-team-name">
             {match.homeTeam}
           </h3>
-          <div className={`bg-volta-home/10 border border-volta-home/30 px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg ${homeWin ? 'bg-green-500/20 border-green-500/50' : ''}`}>
+          <div className={`bg-volta-home/10 border border-volta-home/30 px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg compact-odds ${homeWin ? 'bg-green-500/20 border-green-500/50' : ''}`}>
             <span className={`font-display font-bold text-sm sm:text-xl ${homeWin ? 'text-green-400' : 'text-volta-home'}`}>
               {match.odds.home.toFixed(2)}
             </span>
@@ -104,11 +104,11 @@ export function MatchHeader({ match }: MatchHeaderProps) {
             if (hasResult) {
               return (
                 <div className={`flex flex-col items-center gap-1 sm:gap-2 ${showResultAnimation ? 'volta-winner-reveal' : ''}`}>
-                  <div className="flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-400 px-2 sm:px-3 py-1 rounded-full volta-winner-badge shadow-lg shadow-green-500/30">
+                  <div className="flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-400 px-2 sm:px-3 py-1 rounded-full volta-winner-badge shadow-lg shadow-green-500/30 compact-badge">
                     <Trophy className="w-3 h-3 text-white" />
-                    <span className="text-[10px] sm:text-xs font-bold text-white">WINNER</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-white">WIN</span>
                   </div>
-                  <div className="font-display text-3xl sm:text-5xl font-black tracking-tight flex items-center gap-2 sm:gap-4">
+                  <div className="font-display text-3xl sm:text-5xl font-black tracking-tight flex items-center gap-2 sm:gap-4 compact-score">
                     <span className={`transition-all duration-300 ${homeWin ? 'text-green-400' : 'text-muted-foreground/30'}`}>
                       {match.result!.home}
                     </span>
@@ -117,7 +117,7 @@ export function MatchHeader({ match }: MatchHeaderProps) {
                       {match.result!.away}
                     </span>
                   </div>
-                  <div className="volta-winner-text text-[10px] sm:text-sm font-bold text-center">
+                  <div className="volta-winner-text text-[10px] sm:text-sm font-bold text-center compact-hidden">
                     <span className="text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full">
                       {homeWin ? match.homeTeam : match.awayTeam} 🎉
                     </span>
@@ -127,11 +127,11 @@ export function MatchHeader({ match }: MatchHeaderProps) {
             } else if (match.isLive) {
               return (
                 <>
-                  <div className="flex items-center gap-1 bg-primary px-2 sm:px-3 py-1 rounded-full volta-glow-live">
+                  <div className="flex items-center gap-1 bg-primary px-2 sm:px-3 py-1 rounded-full volta-glow-live compact-badge">
                     <Zap className="w-3 h-3 text-primary-foreground" />
                     <span className="text-[10px] sm:text-xs font-bold text-primary-foreground">LIVE</span>
                   </div>
-                  <div className="font-display text-3xl sm:text-5xl font-black text-muted-foreground tracking-tight">
+                  <div className="font-display text-3xl sm:text-5xl font-black text-muted-foreground tracking-tight compact-vs">
                     VS
                   </div>
                 </>
@@ -139,19 +139,19 @@ export function MatchHeader({ match }: MatchHeaderProps) {
             } else {
               return (
                 <div className="flex flex-col items-center gap-2 sm:gap-3">
-                  <div className="flex items-center gap-1.5 bg-gradient-to-r from-secondary to-amber-500 px-3 sm:px-4 py-1.5 rounded-full volta-glow-betting">
+                  <div className="flex items-center gap-1.5 bg-gradient-to-r from-secondary to-amber-500 px-3 sm:px-4 py-1.5 rounded-full volta-glow-betting compact-badge">
                     <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-secondary-foreground animate-pulse" />
                     <span className="text-xs sm:text-sm font-bold text-secondary-foreground uppercase tracking-wider">Đặt Cược</span>
                   </div>
                   
                   {/* Countdown Timer */}
-                  <div className="volta-countdown-container">
+                  <div className="volta-countdown-container compact-small">
                     <div className="volta-countdown-ring" />
                     <div className="flex flex-col items-center">
                       <span className="font-display font-black text-2xl sm:text-4xl text-secondary tabular-nums volta-countdown-text">
                         {displayTime}
                       </span>
-                      <span className="text-[9px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                      <span className="text-[9px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider compact-hidden">
                         Bắt đầu sau
                       </span>
                     </div>
@@ -163,7 +163,7 @@ export function MatchHeader({ match }: MatchHeaderProps) {
           
           {/* Only show timer for live matches */}
           {match.isLive && !hasResult && (
-            <div className="flex items-center gap-1.5 sm:gap-2 bg-primary/10 border border-primary/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg">
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-primary/10 border border-primary/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg compact-small">
               <span className="w-2 h-2 bg-primary rounded-full volta-pulse" />
               <span className="font-display font-bold text-base sm:text-xl tabular-nums text-primary">{displayTime}</span>
             </div>
@@ -176,24 +176,24 @@ export function MatchHeader({ match }: MatchHeaderProps) {
             <img
               src={match.awayLogo}
               alt={match.awayTeam}
-              className={`w-12 h-12 sm:w-20 sm:h-20 object-contain drop-shadow-lg transition-all duration-500 ${awayWin ? 'drop-shadow-[0_0_15px_hsl(45,100%,50%,0.5)]' : ''}`}
+              className={`w-12 h-12 sm:w-20 sm:h-20 object-contain drop-shadow-lg transition-all duration-500 compact-team-logo ${awayWin ? 'drop-shadow-[0_0_15px_hsl(45,100%,50%,0.5)]' : ''}`}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/placeholder.svg';
               }}
             />
             {awayWin && showResultAnimation && (
-              <div className="absolute -top-2 -right-2 volta-winner-badge">
+              <div className="absolute -top-2 -right-2 volta-winner-badge compact-hidden">
                 <span className="text-xl sm:text-2xl volta-trophy-glow">🏆</span>
               </div>
             )}
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-volta-away/20 px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[10px] font-bold text-volta-away uppercase">
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-volta-away/20 px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[10px] font-bold text-volta-away uppercase compact-hidden">
               Away
             </div>
           </div>
-          <h3 className="font-display font-bold text-xs sm:text-lg text-center leading-tight line-clamp-2">
+          <h3 className="font-display font-bold text-xs sm:text-lg text-center leading-tight line-clamp-2 compact-team-name">
             {match.awayTeam}
           </h3>
-          <div className={`bg-volta-away/10 border border-volta-away/30 px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg ${awayWin ? 'bg-green-500/20 border-green-500/50' : ''}`}>
+          <div className={`bg-volta-away/10 border border-volta-away/30 px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg compact-odds ${awayWin ? 'bg-green-500/20 border-green-500/50' : ''}`}>
             <span className={`font-display font-bold text-sm sm:text-xl ${awayWin ? 'text-green-400' : 'text-volta-away'}`}>
               {match.odds.away.toFixed(2)}
             </span>
