@@ -10,7 +10,8 @@ const HLS_PROXY_URL = 'https://iuvtr.sb21.net/';
 
 function buildProxiedUrl(originalUrl: string): string {
   const encodedUrl = encodeURIComponent(originalUrl);
-  return `${HLS_PROXY_URL}?link=${encodedUrl}&sound=on`;
+  // Thêm autoplay=1 để tự động phát trên mọi trình duyệt
+  return `${HLS_PROXY_URL}?link=${encodedUrl}&sound=on&autoplay=1`;
 }
 
 export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
@@ -36,7 +37,7 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
       <iframe
         src={proxiedUrl}
         className="w-full h-full border-0"
-        allow="autoplay; encrypted-media"
+        allow="autoplay; encrypted-media; fullscreen"
         allowFullScreen
         scrolling="no"
       />
@@ -44,10 +45,11 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
       {/* Overlay chặn tương tác - không cho pause/seek */}
       <div 
         className="absolute inset-0 z-10"
-        style={{ pointerEvents: 'auto' }}
         onContextMenu={(e) => e.preventDefault()}
         onClick={(e) => e.preventDefault()}
         onDoubleClick={(e) => e.preventDefault()}
+        onTouchStart={(e) => e.preventDefault()}
+        onTouchEnd={(e) => e.preventDefault()}
       />
       
       {/* LIVE badge */}
