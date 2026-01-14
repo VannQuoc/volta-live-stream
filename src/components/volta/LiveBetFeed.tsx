@@ -22,13 +22,8 @@ function maskUsername(username: string): string {
 }
 
 export function LiveBetFeed({ bets }: LiveBetFeedProps) {
-  // Default expanded on desktop (lg+), minimized on mobile
-  const [isMinimized, setIsMinimized] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 1024;
-    }
-    return true;
-  });
+  // Default expanded (avoid "missing" content on desktop when viewport is narrow)
+  const [isMinimized, setIsMinimized] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

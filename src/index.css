@@ -242,3 +242,40 @@
     }
   }
 }
+
+@layer utilities {
+  /* Device markers are attached to <html> by useDeviceType() */
+  html[data-device="mobile"],
+  html[data-device="tablet"],
+  html[data-device="desktop"] {}
+
+  /* Optional helpers */
+  .only-mobile { display: none; }
+  .only-tablet { display: none; }
+  .only-desktop { display: none; }
+
+  html.device-mobile .only-mobile { display: block; }
+  html.device-tablet .only-tablet { display: block; }
+  html.device-desktop .only-desktop { display: block; }
+
+  html.device-desktop .not-desktop { display: none; }
+  html.device-mobile .not-mobile { display: none; }
+  html.device-tablet .not-tablet { display: none; }
+
+  /* Visual debug badge (shows current detected device/orientation) */
+  html[data-device] body::after {
+    content: "device=" attr(data-device) " • " attr(data-orientation);
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    z-index: 9999;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font: 600 12px/1.2 ui-sans-serif, system-ui;
+    color: hsl(var(--foreground));
+    background: hsl(var(--card) / 0.8);
+    border: 1px solid hsl(var(--border));
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+  }
+}
