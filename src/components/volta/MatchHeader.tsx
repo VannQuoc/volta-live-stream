@@ -138,25 +138,36 @@ export function MatchHeader({ match }: MatchHeaderProps) {
               );
             } else {
               return (
-                <>
-                  <div className="flex items-center gap-1 bg-secondary px-2 sm:px-3 py-1 rounded-full">
-                    <Clock className="w-3 h-3 text-secondary-foreground" />
-                    <span className="text-[10px] sm:text-xs font-bold text-secondary-foreground">BETTING</span>
+                <div className="flex flex-col items-center gap-2 sm:gap-3">
+                  <div className="flex items-center gap-1.5 bg-gradient-to-r from-secondary to-amber-500 px-3 sm:px-4 py-1.5 rounded-full volta-glow-betting">
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-secondary-foreground animate-pulse" />
+                    <span className="text-xs sm:text-sm font-bold text-secondary-foreground uppercase tracking-wider">Đặt Cược</span>
                   </div>
-                  <div className="font-display text-3xl sm:text-5xl font-black text-muted-foreground tracking-tight">
-                    VS
+                  
+                  {/* Countdown Timer */}
+                  <div className="volta-countdown-container">
+                    <div className="volta-countdown-ring" />
+                    <div className="flex flex-col items-center">
+                      <span className="font-display font-black text-2xl sm:text-4xl text-secondary tabular-nums volta-countdown-text">
+                        {displayTime}
+                      </span>
+                      <span className="text-[9px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                        Bắt đầu sau
+                      </span>
+                    </div>
                   </div>
-                </>
+                </div>
               );
             }
           })()}
-          <div className="flex items-center gap-1 sm:gap-2 bg-muted px-2 sm:px-4 py-1 sm:py-2 rounded-lg">
-            <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
-            <span className="font-display font-bold text-base sm:text-xl tabular-nums">{displayTime}</span>
-            {!match.isLive && !hasResult && (
-              <span className="text-[10px] sm:text-xs text-muted-foreground">còn lại</span>
-            )}
-          </div>
+          
+          {/* Only show timer for live matches */}
+          {match.isLive && !hasResult && (
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-primary/10 border border-primary/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg">
+              <span className="w-2 h-2 bg-primary rounded-full volta-pulse" />
+              <span className="font-display font-bold text-base sm:text-xl tabular-nums text-primary">{displayTime}</span>
+            </div>
+          )}
         </div>
 
         {/* Away Team */}

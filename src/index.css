@@ -193,4 +193,52 @@
       transform: scale(1);
     }
   }
+
+  /* Countdown Timer Styles */
+  .volta-countdown-container {
+    @apply relative flex items-center justify-center;
+    width: 100px;
+    height: 100px;
+  }
+
+  @screen sm {
+    .volta-countdown-container {
+      width: 140px;
+      height: 140px;
+    }
+  }
+
+  .volta-countdown-ring {
+    @apply absolute inset-0 rounded-full;
+    background: conic-gradient(
+      from 0deg,
+      hsl(var(--secondary)) 0%,
+      hsl(var(--secondary) / 0.3) 50%,
+      hsl(var(--secondary)) 100%
+    );
+    animation: volta-countdown-spin 3s linear infinite;
+  }
+
+  .volta-countdown-ring::before {
+    content: '';
+    @apply absolute rounded-full bg-card;
+    inset: 4px;
+  }
+
+  @keyframes volta-countdown-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .volta-countdown-text {
+    text-shadow: 0 0 20px hsl(var(--secondary) / 0.5);
+  }
+
+  /* Landscape mode optimization */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .volta-countdown-container {
+      width: 80px;
+      height: 80px;
+    }
+  }
 }

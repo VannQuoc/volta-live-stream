@@ -35,32 +35,34 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-2 sm:px-4 py-3 sm:py-6">
+      <main className="container mx-auto px-2 sm:px-4 py-3 sm:py-6 landscape:py-2">
         {!currentMatch ? (
-          <div className="flex flex-col items-center justify-center py-12 sm:py-20">
-            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-muted rounded-full flex items-center justify-center mb-4 sm:mb-6 animate-pulse">
-              <Trophy className="w-8 h-8 sm:w-12 sm:h-12 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center py-12 sm:py-20 landscape:py-6">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 landscape:w-12 landscape:h-12 bg-muted rounded-full flex items-center justify-center mb-4 sm:mb-6 landscape:mb-2 animate-pulse">
+              <Trophy className="w-8 h-8 sm:w-12 sm:h-12 landscape:w-6 landscape:h-6 text-muted-foreground" />
             </div>
-            <h2 className="font-display font-bold text-lg sm:text-2xl mb-2 text-center">
+            <h2 className="font-display font-bold text-lg sm:text-2xl landscape:text-base mb-2 text-center">
               {isConnected ? 'Đang tải trận đấu...' : 'Đang kết nối...'}
             </h2>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <p className="text-sm sm:text-base landscape:text-xs text-muted-foreground">
               Vui lòng đợi trong giây lát
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-6 landscape:gap-2">
             {/* Left Column - Video & Match Header */}
-            <div className="lg:col-span-2 space-y-3 sm:space-y-6">
+            <div className="lg:col-span-2 space-y-3 sm:space-y-6 landscape:space-y-2">
               <VideoPlayer
                 streamUrl={currentMatch.streamUrl}
                 isLive={currentMatch.isLive}
               />
-              <MatchHeader match={currentMatch} />
+              <div className="landscape:hidden sm:block">
+                <MatchHeader match={currentMatch} />
+              </div>
             </div>
 
             {/* Right Column - Stats & Feed */}
-            <div className="space-y-3 sm:space-y-6">
+            <div className="space-y-3 sm:space-y-6 landscape:hidden">
               <BettingStats match={currentMatch} />
               <LiveBetFeed bets={currentMatch.liveBets} />
             </div>
