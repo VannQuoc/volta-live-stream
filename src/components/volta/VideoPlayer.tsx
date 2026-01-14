@@ -10,8 +10,9 @@ const HLS_PROXY_URL = 'https://iuvtr.sb21.net/';
 
 function buildProxiedUrl(originalUrl: string): string {
   const encodedUrl = encodeURIComponent(originalUrl);
-  // Thêm autoplay=1 để tự động phát trên mọi trình duyệt
-  return `${HLS_PROXY_URL}?link=${encodedUrl}&sound=on&autoplay=1`;
+  // Thêm autoplay=1 và muted=1 để tự động phát trên mọi trình duyệt
+  // Các trình duyệt chỉ cho phép autoplay khi video muted
+  return `${HLS_PROXY_URL}?link=${encodedUrl}&autoplay=1&muted=1`;
 }
 
 export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
@@ -33,13 +34,15 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
 
   return (
     <div className="relative aspect-video w-full overflow-hidden rounded-xl volta-glow-live bg-black">
-      {/* Iframe nhúng video */}
+      {/* Iframe nhúng video - muted để autoplay hoạt động trên mọi trình duyệt */}
       <iframe
         src={proxiedUrl}
         className="w-full h-full border-0"
-        allow="autoplay; encrypted-media; fullscreen"
+        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
         allowFullScreen
         scrolling="no"
+        // @ts-ignore
+        muted
       />
       
       {/* Overlay chặn tương tác - không cho pause/seek */}

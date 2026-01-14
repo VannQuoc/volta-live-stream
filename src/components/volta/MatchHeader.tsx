@@ -13,13 +13,19 @@ export function MatchHeader({ match }: MatchHeaderProps) {
   const serverOffsetRef = useRef<number>(0);
   const prevIsLiveRef = useRef<boolean>(match.isLive);
 
-  // Detect khi trận đấu kết thúc để trigger animation
+  const prevResultRef = useRef<string | null>(null);
+
+  // Detect khi có result từ server để trigger animation ngay lập tức
   useEffect(() => {
-    if (prevIsLiveRef.current && !match.isLive && match.result) {
+    const currentResultStr = match.result ? `${match.result.home}-${match.result.away}` : null;
+    const hasWinner = match.result && (match.result.home === 1 || match.result.away === 1);
+    
+    // Nếu có result mới và có đội thắng -> trigger animation
+    if (hasWinner && prevResultRef.current !== currentResultStr) {
       setShowResultAnimation(true);
     }
-    prevIsLiveRef.current = match.isLive;
-  }, [match.isLive, match.result]);
+    prevResultRef.current = currentResultStr;
+  }, [match.result]);
 
   useEffect(() => {
     const serverSnapshot = new Date(match.serverSnapshotTime).getTime();
@@ -86,23 +92,13 @@ export function MatchHeader({ match }: MatchHeaderProps) {
         <div className="flex flex-col items-center gap-2">
           {(() => {
             // Kiểm tra kết quả - result.home hoặc result.away = 1 nghĩa là đội đó thắng
+            // Hiển thị ngay khi có result, không đợi isLive = false
             const hasResult = match.result && (match.result.home === 1 || match.result.away === 1);
             const homeWin = match.result?.home === 1;
             const awayWin = match.result?.away === 1;
 
-            if (match.isLive) {
-              return (
-                <>
-                  <div className="flex items-center gap-1 bg-primary px-3 py-1 rounded-full">
-                    <Zap className="w-3 h-3 text-primary-foreground" />
-                    <span className="text-xs font-bold text-primary-foreground">LIVE</span>
-                  </div>
-                  <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
-                    VS
-                  </div>
-                </>
-              );
-            } else if (hasResult) {
+            // Ưu tiên hiển thị kết quả khi có result (dù vẫn đang live)
+            if (hasResult) {
               return (
                 <>
                   <div className={`flex items-center gap-1 bg-green-500 px-3 py-1 rounded-full ${showResultAnimation ? 'animate-scale-in' : ''}`}>
@@ -131,6 +127,18 @@ export function MatchHeader({ match }: MatchHeaderProps) {
                   <div className="text-sm font-bold mt-1">
                     {homeWin && <span className="text-green-400">{match.homeTeam} THẮNG!</span>}
                     {awayWin && <span className="text-green-400">{match.awayTeam} THẮNG!</span>}
+                  </div>
+                </>
+              );
+            } else if (match.isLive) {
+              return (
+                <>
+                  <div className="flex items-center gap-1 bg-primary px-3 py-1 rounded-full">
+                    <Zap className="w-3 h-3 text-primary-foreground" />
+                    <span className="text-xs font-bold text-primary-foreground">LIVE</span>
+                  </div>
+                  <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
+                    VS
                   </div>
                 </>
               );
