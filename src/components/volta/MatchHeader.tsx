@@ -1,6 +1,6 @@
 import { VoltaMatch } from '@/types/volta';
 import { useEffect, useState, useRef } from 'react';
-import { Clock, Zap } from 'lucide-react';
+import { Clock, Zap, Trophy } from 'lucide-react';
 
 interface MatchHeaderProps {
   match: VoltaMatch;
@@ -8,16 +8,24 @@ interface MatchHeaderProps {
 
 export function MatchHeader({ match }: MatchHeaderProps) {
   const [displayTime, setDisplayTime] = useState('00:00');
+  const [showResultAnimation, setShowResultAnimation] = useState(false);
   const localStartRef = useRef<number>(0);
   const serverOffsetRef = useRef<number>(0);
+  const prevIsLiveRef = useRef<boolean>(match.isLive);
+
+  // Detect khi trận đấu kết thúc để trigger animation
+  useEffect(() => {
+    if (prevIsLiveRef.current && !match.isLive && match.result) {
+      setShowResultAnimation(true);
+    }
+    prevIsLiveRef.current = match.isLive;
+  }, [match.isLive, match.result]);
 
   useEffect(() => {
-    // Khi nhận được message mới, tính toán offset
     const serverSnapshot = new Date(match.serverSnapshotTime).getTime();
     const kickoff = new Date(match.kickoffTime).getTime();
     const localNow = Date.now();
     
-    // Server offset = local time - server snapshot time
     serverOffsetRef.current = localNow - serverSnapshot;
     localStartRef.current = localNow;
 
@@ -25,18 +33,15 @@ export function MatchHeader({ match }: MatchHeaderProps) {
       const now = Date.now();
       const elapsedSinceMessage = now - localStartRef.current;
       
-      // Thời gian server hiện tại (ước tính) = serverSnapshot + elapsed
       const estimatedServerNow = new Date(match.serverSnapshotTime).getTime() + elapsedSinceMessage;
       const kickoffTime = new Date(match.kickoffTime).getTime();
       
       if (match.isLive) {
-        // Khi live: đếm thời gian đã trôi qua kể từ kickoff
         const elapsed = Math.max(0, estimatedServerNow - kickoffTime);
         const mins = Math.floor(elapsed / 60000);
         const secs = Math.floor((elapsed % 60000) / 1000);
         setDisplayTime(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
       } else {
-        // Khi betting: đếm ngược đến kickoff
         const remaining = Math.max(0, kickoffTime - estimatedServerNow);
         const mins = Math.floor(remaining / 60000);
         const secs = Math.floor((remaining % 60000) / 1000);
@@ -85,20 +90,20 @@ export function MatchHeader({ match }: MatchHeaderProps) {
                 <Zap className="w-3 h-3 text-primary-foreground" />
                 <span className="text-xs font-bold text-primary-foreground">LIVE</span>
               </div>
-              {/* Chỉ hiện VS khi đang live, kết quả sẽ hiện sau khi kết thúc */}
               <div className="font-display text-5xl font-black text-muted-foreground tracking-tight">
                 VS
               </div>
             </>
           ) : match.result ? (
             <>
-              <div className="flex items-center gap-1 bg-green-500 px-3 py-1 rounded-full">
+              <div className={`flex items-center gap-1 bg-green-500 px-3 py-1 rounded-full ${showResultAnimation ? 'animate-scale-in' : ''}`}>
+                <Trophy className="w-3 h-3 text-white" />
                 <span className="text-xs font-bold text-white">KẾT THÚC</span>
               </div>
-              <div className="font-display text-5xl font-black tracking-tight">
-                <span className="text-volta-home">{match.result.home}</span>
+              <div className={`font-display text-5xl font-black tracking-tight ${showResultAnimation ? 'animate-bounce' : ''}`}>
+                <span className="text-volta-home animate-pulse">{match.result.home}</span>
                 <span className="text-muted-foreground mx-2">-</span>
-                <span className="text-volta-away">{match.result.away}</span>
+                <span className="text-volta-away animate-pulse">{match.result.away}</span>
               </div>
             </>
           ) : (
@@ -115,7 +120,7 @@ export function MatchHeader({ match }: MatchHeaderProps) {
           <div className="flex items-center gap-2 bg-muted px-4 py-2 rounded-lg">
             <Clock className="w-4 h-4 text-muted-foreground" />
             <span className="font-display font-bold text-xl tabular-nums">{displayTime}</span>
-            {!match.isLive && (
+            {!match.isLive && !match.result && (
               <span className="text-xs text-muted-foreground">còn lại</span>
             )}
           </div>
