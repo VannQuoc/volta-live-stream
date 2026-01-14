@@ -31,10 +31,16 @@ export function useDeviceType(): { device: DeviceType; orientation: "portrait" |
 
   React.useEffect(() => {
     const html = document.documentElement;
+    const body = document.body;
 
     const applyMarkers = (device: DeviceType, orientation: "portrait" | "landscape") => {
+      // Put markers on <html> for CSS selectors
       html.dataset.device = device;
       html.dataset.orientation = orientation;
+
+      // Also mirror onto <body> so CSS `attr()` can read it for debug overlays
+      body.dataset.device = device;
+      body.dataset.orientation = orientation;
 
       html.classList.remove("device-mobile", "device-tablet", "device-desktop");
       html.classList.add(`device-${device}`);

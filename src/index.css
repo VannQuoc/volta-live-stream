@@ -263,7 +263,7 @@
   html.device-tablet .not-tablet { display: none; }
 
   /* Visual debug badge (shows current detected device/orientation) */
-  html[data-device] body::after {
+  body[data-device]::after {
     content: "device=" attr(data-device) " • " attr(data-orientation);
     position: fixed;
     bottom: 10px;

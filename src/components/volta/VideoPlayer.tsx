@@ -1,4 +1,4 @@
-import { Play, Volume2, VolumeX } from 'lucide-react';
+import { Play, Volume2 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 interface VideoPlayerProps {
@@ -9,28 +9,31 @@ interface VideoPlayerProps {
 // Proxy URL để bypass CORS cho HLS stream
 const HLS_PROXY_URL = 'https://iuvtr.sb21.net/';
 
-function buildProxiedUrl(originalUrl: string, muted: boolean): string {
+function buildProxiedUrl(originalUrl: string): string {
   const encodedUrl = encodeURIComponent(originalUrl);
-  return `${HLS_PROXY_URL}?link=${encodedUrl}&autoplay=1&muted=${muted ? 1 : 0}`;
+  // Keep autoplay muted for browser compatibility.
+  // Users can unmute using the embedded player's own controls without reloading.
+  return `${HLS_PROXY_URL}?link=${encodedUrl}&autoplay=1&muted=1`;
 }
 
 export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
-  const [isMuted, setIsMuted] = useState(true);
+  const [wantsSoundHint, setWantsSoundHint] = useState(false);
   const prevIsLiveRef = useRef(isLive);
-  const iframeKey = useRef(0);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  // Auto mute khi trận kết thúc
+  // Auto mute khi trận kết thúc: reload iframe once to ensure it returns to muted autoplay state
   useEffect(() => {
     if (prevIsLiveRef.current && !isLive) {
-      setIsMuted(true);
-      iframeKey.current += 1;
+      setWantsSoundHint(false);
+      setReloadKey((k) => k + 1);
     }
     prevIsLiveRef.current = isLive;
   }, [isLive]);
 
-  const toggleMute = () => {
-    setIsMuted(prev => !prev);
-    iframeKey.current += 1;
+  const requestSound = () => {
+    // We avoid remounting the iframe here (remount = restart stream).
+    // Instead, we show a hint so the user can unmute inside the player.
+    setWantsSoundHint(true);
   };
 
   if (!isLive || !streamUrl) {
@@ -47,43 +50,40 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
     );
   }
 
-  const proxiedUrl = buildProxiedUrl(streamUrl, isMuted);
+  const proxiedUrl = buildProxiedUrl(streamUrl);
 
   return (
     <div className="relative aspect-video w-full overflow-hidden rounded-xl volta-glow-live bg-black landscape:aspect-[21/9]">
       {/* Iframe nhúng video */}
       <iframe
-        key={iframeKey.current}
+        key={reloadKey}
         src={proxiedUrl}
         className="w-full h-full border-0"
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
         allowFullScreen
         scrolling="no"
       />
-      
+
       {/* LIVE badge */}
       <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-20 flex items-center gap-1.5 sm:gap-2 bg-primary/90 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full pointer-events-none">
         <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary-foreground rounded-full volta-pulse" />
         <span className="text-[10px] sm:text-xs font-bold text-primary-foreground uppercase tracking-wider">LIVE</span>
       </div>
-      
-      {/* Mute/Unmute button */}
+
+      {/* Sound helper (does NOT reload stream) */}
       <button
-        onClick={toggleMute}
+        onClick={requestSound}
         className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 z-20 flex items-center gap-1.5 bg-black/70 hover:bg-black/90 backdrop-blur-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all active:scale-95"
       >
-        {isMuted ? (
-          <>
-            <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            <span className="text-[10px] sm:text-xs font-medium text-white/80">Bật tiếng</span>
-          </>
-        ) : (
-          <>
-            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-            <span className="text-[10px] sm:text-xs font-medium text-primary">Đang phát</span>
-          </>
-        )}
+        <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+        <span className="text-[10px] sm:text-xs font-medium text-white/80">Bật tiếng</span>
       </button>
+
+      {wantsSoundHint && (
+        <div className="absolute bottom-12 right-2 sm:bottom-14 sm:right-3 z-20 max-w-[220px] rounded-lg border border-border bg-card/90 backdrop-blur px-3 py-2 text-xs text-foreground shadow-lg">
+          Bật tiếng trực tiếp trong trình phát (icon loa). Nút này không reload để tránh xem lại từ đầu.
+        </div>
+      )}
     </div>
   );
 }
