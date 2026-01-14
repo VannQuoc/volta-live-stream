@@ -9,6 +9,48 @@ html.compact-mode .compact-hidden {
   display: none !important;
 }
 
+/* Make video wider in fullscreen landscape on mobile/tablet */
+html.compact-mode .video-player {
+  aspect-ratio: 21 / 9;
+}
+
+html.compact-mode .compact-main {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+html.compact-mode .compact-grid {
+  gap: 0.5rem !important;
+}
+
+html.compact-mode .compact-stack {
+  gap: 0.5rem !important;
+}
+
+html.compact-mode .compact-wait {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+html.compact-mode .compact-wait-icon {
+  width: 3rem !important;
+  height: 3rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+html.compact-mode .compact-wait-trophy {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+
+html.compact-mode .compact-wait-title {
+  font-size: 0.95rem !important;
+}
+
+html.compact-mode .compact-wait-sub {
+  font-size: 0.75rem !important;
+}
+
 html.compact-mode .compact-small {
   transform: scale(0.75);
   transform-origin: center;

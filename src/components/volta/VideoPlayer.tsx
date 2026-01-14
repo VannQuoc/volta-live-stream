@@ -38,7 +38,7 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
 
   if (!isLive || !streamUrl) {
     return (
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-muted flex items-center justify-center landscape:aspect-[21/9]">
+      <div className="video-player relative aspect-video w-full overflow-hidden rounded-xl bg-muted flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-br from-muted via-background to-muted animate-pulse" />
         <div className="relative z-10 flex flex-col items-center gap-3 sm:gap-4">
           <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-secondary/20 flex items-center justify-center volta-glow-betting">
@@ -53,7 +53,7 @@ export function VideoPlayer({ streamUrl, isLive }: VideoPlayerProps) {
   const proxiedUrl = buildProxiedUrl(streamUrl);
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-xl volta-glow-live bg-black landscape:aspect-[21/9]">
+    <div className="video-player relative aspect-video w-full overflow-hidden rounded-xl volta-glow-live bg-black">
       {/* Iframe nhúng video */}
       <iframe
         key={reloadKey}
