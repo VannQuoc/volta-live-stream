@@ -4,6 +4,7 @@ import { MatchHeader } from '@/components/volta/MatchHeader';
 import { BettingStats } from '@/components/volta/BettingStats';
 import { LiveBetFeed } from '@/components/volta/LiveBetFeed';
 import { ConnectionStatus } from '@/components/volta/ConnectionStatus';
+import { DebugPanel } from '@/components/volta/DebugPanel';
 import { Trophy, Gamepad2 } from 'lucide-react';
 
 const Index = () => {
@@ -65,6 +66,7 @@ const Index = () => {
             <div className="space-y-3 sm:space-y-6 compact-hidden lg:block">
               <BettingStats match={currentMatch} />
               <LiveBetFeed bets={currentMatch.liveBets} />
+              <DebugPanel match={currentMatch} />
             </div>
           </div>
         )}
